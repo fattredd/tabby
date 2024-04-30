@@ -2,19 +2,20 @@ name: Package and Release
 
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - main
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions: write-all
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'
 
@@ -22,13 +23,14 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install -r build_requirements.txt
 
     - name: Package application
-      run: python setup.py sdist bdist_wheel
+      run: python setup.py sdist
       
     - name: Get version
       id: get_version
-      run: echo ::set-output name=VERSION::$(python -c "from setup import VERSION; print(VERSION)")
+      run: echo VERSION=$(python -c "from _version import __version__; print(__version__)") >> $GITHUB_OUTPUT
 
     - name: Create Release
       id: create_release
@@ -42,7 +44,7 @@ jobs:
         prerelease: false
 
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
+      uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:

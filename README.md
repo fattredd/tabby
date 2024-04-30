@@ -21,6 +21,12 @@ Features
 - Toggle visibility of inactive tab groups
 - Tab status indicator
 
+Screenshots
+===
+![Tabby](./assets/Tabby01.png)
+![Tabby](./assets/Tabby02.png)
+![Tabby](./assets/Tabby_hidden_unused_groups.png)
+
 Configuration
 ===
 Tabby is configured using YAML files. You can create a `config` directory in

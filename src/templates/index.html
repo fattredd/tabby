@@ -54,6 +54,27 @@
       background-color: #444;
     }
 
+    .tab .status-circle {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+
+    .tab .green {
+      background-color: green;
+    }
+    
+    .tab .yellow {
+      background-color: yellow;
+    }
+    
+    .tab .red {
+      background-color: red;
+    }
+
     .tabcontent {
       display: none;
       padding: 6px 12px;
@@ -93,7 +114,9 @@
     <div class="tab" id="{{ group_name }}">
       <div class="tablabel">{{ group_name }}</div>
       {% for tab in tabs %}
-        <button class="tablinks" onclick="openTab(event, '{{ tab.name }}')">{{ tab.name }}</button>
+        <button class="tablinks" onclick="openTab(event, '{{ tab.name }}')">
+          {{ tab.name }} <span id="{{ tab.name }}-status" class="status-circle yellow"></span>
+        </button>
       {% endfor %}
     </div>
 
@@ -136,6 +159,34 @@
         }
       }
     }
+
+    // iFrame status handling
+    function onIFrameLoad(tabName) {
+      var statusCircle  = document.getElementById(tabName + "-status");
+      statusCircle.classList.remove("yellow", "red");
+      statusCircle.classList.add("green");
+    }
+    
+    function onIFrameError(tabName) {
+      var statusCircle  = document.getElementById(tabName + "-status");
+      statusCircle.classList.remove("green", "yellow");
+      statusCircle.classList.add("red");
+    }
+
+    var iframeTimeouts = {};
+    document.querySelectorAll("iframe").forEach(function(iframe) {
+      iframe.onload = function() {
+        clearTimeout(iframeTimeouts[iframe.parentElement.id]);
+        onIFrameLoad(iframe.parentElement.id);
+      };
+      iframe.onerror = function() {
+        clearTimeout(iframeTimeouts[iframe.parentElement.id]);
+        onIFrameError(iframe.parentElement.id);
+      };
+      iframeTimeouts[iframe.parentElement.id] = setTimeout(function() {
+        onIFrameError(iframe.parentElement.id);
+      }, 5000); // Set timeout to 5 seconds (5000 milliseconds)
+    });
   </script>
 
 </body>

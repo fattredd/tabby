@@ -19,7 +19,7 @@ Features
 - Load tab configurations from YAML files
 - Group tabs into groups
 - Toggle visibility of inactive tab groups
-- Dark mode for better readability
+- Tab status indicator
 
 Configuration
 ===

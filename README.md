@@ -1,4 +1,3 @@
-=====
 tabby
 =====
 
@@ -32,14 +31,14 @@ multiple files.
 Example configuration:
 ```yaml
 tabGroupA:
-    - name: SomeApp
+  - name: SomeApp
     url: http://something:8080
-    - name: SomeOtherApp
+  - name: SomeOtherApp
     url: http://something:8081
 tabGroupB:
-    - name: SomeThing
+  - name: SomeThing
     url: http://something:8083
-    - name: SomeAppThing
+  - name: SomeAppThing
     url: http://something:8084
 ```
 
@@ -52,16 +51,18 @@ port 5000, but you can map it to any port you want.
 ```yaml
 version: '3.7'
 services:
-    tabby:
-        image: ghcr.io/fattredd/tabby:latest
-        ports:
-        - "5000:5000"
-        volumes:
-        - ./config:/app/config
+  tabby:
+    image: ghcr.io/fattredd/tabby:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./config:/app/config
 ```
 
 Building the docker image
 ===
+
+You can build the docker image with the following command:
 
 ```bash
 docker build -t tabby .
@@ -71,7 +72,7 @@ then you can run it with
  
 ```bash
 docker run \
-    -p 5000:5000 \
-    -v $(pwd)/config:/app/config \
-    tabby
+  -p 5000:5000 \
+  -v $(pwd)/config:/app/config \
+  tabby
 ```

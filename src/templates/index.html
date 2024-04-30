@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local Services Dashboard</title>
+  <style>
+    body {
+      background-color: #222;
+      color: #fff;
+    }
+
+    #tab-container {
+      display: flex;
+      flex-flow: column;
+      height: calc(100vh - 20px); /* Adjust for margins */
+    }
+
+    .tab {
+      overflow: hidden;
+      border: 1px solid #444;
+      background-color: #333;
+      flex: 0 1 auto;
+    }
+
+    .tablabel {
+      background-color: inherit;
+      color: black;
+      float: left;
+      border: none;
+      outline: none;
+      padding: 14px 16px;
+      color: inherit;
+      font-weight: bold;
+    }
+
+    .tab button {
+      background-color: inherit;
+      float: left;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      transition: 0.3s;
+      color: inherit;
+    }
+
+    .tab button:hover {
+      background-color: #555;
+    }
+
+    .tab button.active {
+      background-color: #444;
+    }
+
+    .tab .status-circle {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+
+    .tab .green {
+      background-color: green;
+    }
+    
+    .tab .yellow {
+      background-color: yellow;
+    }
+    
+    .tab .red {
+      background-color: red;
+    }
+
+    .tabcontent {
+      display: none;
+      padding: 6px 12px;
+      border: 1px solid #444;
+      border-top: none;
+      background-color: #333;
+      flex: 1 1 auto;
+    }
+
+    .hide-inactive {
+      border: 1px solid #444;
+      background-color: #333;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: 0.3s;
+      color: inherit;
+      position: absolute;
+      right: 10px;
+    }
+    
+    .hidden {
+      display: none;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+
+<body>
+  <button class="hide-inactive" onclick="toggleInactiveTabGroups()">Hide Inactive Groups</button>
+  <div id="tab-container">
+  {% for group_name, tabs in tab_groups.items() %}
+    <div class="tab" id="{{ group_name }}">
+      <div class="tablabel">{{ group_name }}</div>
+      {% for tab in tabs %}
+        <button class="tablinks" onclick="openTab(event, '{{ tab.name }}')">
+          {{ tab.name }} <span id="{{ tab.name }}-status" class="status-circle yellow"></span>
+        </button>
+      {% endfor %}
+    </div>
+
+    {% for tab in tabs %}
+      <div id="{{ tab.name }}" class="tabcontent">
+        <iframe src="{{ tab.url }}"></iframe>
+      </div>
+    {% endfor %}
+  {% endfor %}
+  </div>
+
+  <script>
+    function openTab(evt, tabName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(tabName).style.display = "inherit";
+      evt.currentTarget.className += " active";
+    }
+
+    function toggleInactiveTabGroups() {
+      var tab_groups = document.getElementsByClassName("tab");
+      for (var i = 0; i < tab_groups.length; i++) {
+        var tablinks = tab_groups[i].getElementsByClassName("tablinks");
+        let isActive = false;
+        for (var j = 0; j < tablinks.length; j++) {
+          if (tablinks[j].classList.contains("active")) {
+            isActive = true;
+            break;
+          }
+        }
+        if (!isActive) {
+          tab_groups[i].classList.toggle("hidden");
+        }
+      }
+    }
+
+    // iFrame status handling
+    function onIFrameLoad(tabName) {
+      var statusCircle  = document.getElementById(tabName + "-status");
+      statusCircle.classList.remove("yellow", "red");
+      statusCircle.classList.add("green");
+    }
+    
+    function onIFrameError(tabName) {
+      var statusCircle  = document.getElementById(tabName + "-status");
+      statusCircle.classList.remove("green", "yellow");
+      statusCircle.classList.add("red");
+    }
+
+    var iframeTimeouts = {};
+    document.querySelectorAll("iframe").forEach(function(iframe) {
+      iframe.onload = function() {
+        clearTimeout(iframeTimeouts[iframe.parentElement.id]);
+        onIFrameLoad(iframe.parentElement.id);
+      };
+      iframe.onerror = function() {
+        clearTimeout(iframeTimeouts[iframe.parentElement.id]);
+        onIFrameError(iframe.parentElement.id);
+      };
+      iframeTimeouts[iframe.parentElement.id] = setTimeout(function() {
+        onIFrameError(iframe.parentElement.id);
+      }, 5000); // Set timeout to 5 seconds (5000 milliseconds)
+    });
+  </script>
+
+</body>
+
+</html>

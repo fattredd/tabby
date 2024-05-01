@@ -24,17 +24,9 @@ VERSION = __version__
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-REQUIRED = [
-    "flask",
-    "maya",
-    "records",
-]
 with io.open(os.path.join(here, "requirements.txt"), encoding="utf-8") as f:
     REQUIRED = f.read().split("\n")
     
-
-
-# What packages are optional?
 EXTRAS = {}
 
 try:

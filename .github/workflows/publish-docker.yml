@@ -46,11 +46,11 @@ jobs:
       with:
         context: .
         push: true
-        tags: ghcr.io/${{ github.repository }}/tabby:${{ steps.get_version.outputs.VERSION }}
+        tags: ghcr.io/${{ github.repository }}:${{ steps.get_version.outputs.VERSION }}
           
     - name: push latest image
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
-        tags: ghcr.io/${{ github.repository }}/tabby:latest
+        tags: ghcr.io/${{ github.repository }}:latest
